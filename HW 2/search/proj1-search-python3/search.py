@@ -61,6 +61,24 @@ class SearchProblem:
         """
         util.raiseNotDefined()
 
+class GraphNode:
+    
+    def __init__(self, state, action= None, prev=None, heuristic=0):
+        self.state = state
+        self.prev = prev
+        self.action = action
+        self.heuristic = heuristic
+
+    def getPath(self):
+        actions = list()
+        curr_node = self
+        while curr_node:
+            actions.append(curr_node.action)
+            curr_node = curr_node.prev
+        actions.reverse()
+        return actions[1:]
+
+        
 
 def tinyMazeSearch(problem):
     """
@@ -87,7 +105,22 @@ def depthFirstSearch(problem):
     print("Start's successors:", problem.getSuccessors(problem.getStartState()))
     """
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    # so that we visit every node atmost once
+    visited = set()
+    fringe = util.Stack()
+    fringe.push(GraphNode(state= problem.getStartState()))
+
+    while not fringe.isEmpty():
+        node = fringe.pop()
+
+        if problem.isGoalState(node.state):
+            return node.getPath()
+            
+        if node.state not in visited:
+            visited.add(node.state)
+            for child in problem.getSuccessors(node.state):
+                fringe.push(GraphNode(state= child[0], action= child[1], prev=node))
+    return list()
 
 def breadthFirstSearch(problem):
     """Search the shallowest nodes in the search tree first."""
