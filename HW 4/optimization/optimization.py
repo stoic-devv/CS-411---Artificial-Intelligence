@@ -190,13 +190,14 @@ class TravellingSalesmanProblem(Annealer):
         'Baltimore': (39.28, 76.62)
     }
 
+
     """problem-specific helper function"""
     """you may wish to implement this """
     def distance(self, a, b):
         """Calculates distance between two latitude-longitude coordinates."""
         # -----------------------------
         # Your code
-        return 0.0
+        return math.dist(a,b)
         # -----------------------------
 
 
@@ -212,8 +213,8 @@ class TravellingSalesmanProblem(Annealer):
 
         # --------------------
         # Your code
-
-        pass
+        idx0, idx1 = random.choices(range(len(self.state)), k=2)
+        self.state[idx0], self.state[idx1] = self.state[idx1], self.state[idx0]
         # -------------------------
 
 
@@ -223,13 +224,12 @@ class TravellingSalesmanProblem(Annealer):
     """ Use self.cities to find a city's coordinates"""
     def energy(self):
         # Initialize the value to be returned
-        e = 0
-        
+        e = 0        
         #-----------------------
         # Your code
-
-
-
+        for idx in range(1, len(self.state)):
+            e += self.distance(self.cities.get(self.state[idx-1]),
+             self.cities.get(self.state[idx]))
         #-----------------------
 
         return e
