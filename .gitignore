@@ -1,6 +1,8 @@
 
-*__pycache__
+./**/__pycache__/
+HW 2/search/proj1-search-python3/__pycache__
 *.pyc
 test_cases
+prev-soln
 
 Stuart Russell, Peter Norvig - Artificial Intelligence_ A Modern Approach-Prentice Hall (1995).pdf
