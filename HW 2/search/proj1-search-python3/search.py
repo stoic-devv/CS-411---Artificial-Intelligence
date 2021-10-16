@@ -17,6 +17,7 @@ In search.py, you will implement generic search algorithms which are called by
 Pacman agents (in searchAgents.py).
 """
 
+from heapq import heapify
 import util
 
 class SearchProblem:
@@ -61,6 +62,24 @@ class SearchProblem:
         """
         util.raiseNotDefined()
 
+class GraphNode:
+    
+    def __init__(self, state, action= None, prev=None, priority=0):
+        self.state = state
+        self.prev = prev
+        self.action = action
+        self.priority = priority
+
+    def getPath(self):
+        actions = list()
+        curr_node = self
+        while curr_node:
+            actions.append(curr_node.action)
+            curr_node = curr_node.prev
+        actions.reverse()
+        return actions[1:]
+
+        
 
 def tinyMazeSearch(problem):
     """
@@ -71,6 +90,55 @@ def tinyMazeSearch(problem):
     s = Directions.SOUTH
     w = Directions.WEST
     return  [s, s, w, s, w, w, s, w]
+
+def graphSearchNoCost(problem, fringe):
+    # so that we visit every node atmost once
+    visited = set()
+    fringe.push(GraphNode(state= problem.getStartState()))
+
+    while not fringe.isEmpty():
+        node = fringe.pop()
+
+        if problem.isGoalState(node.state):
+            return node.getPath()
+            
+        if node.state not in visited:
+            visited.add(node.state)
+            for child in problem.getSuccessors(node.state):
+                fringe.push(GraphNode(state= child[0], action= child[1], 
+                prev=node))
+    return list()
+
+def nullHeuristic(state, problem=None):
+    """
+    A heuristic function estimates the cost from the current state to the nearest
+    goal in the provided SearchProblem.  This heuristic is trivial.
+    """
+    return 0
+
+def graphSearchWithCost(problem, fringe, heuristic=nullHeuristic):
+    # so that we visit every node atmost once
+    visited = set()
+    start_state = problem.getStartState()
+    fringe.push(item=GraphNode(state= start_state,\
+        priority= heuristic(start_state, problem)),\
+            priority=heuristic(start_state, problem))
+
+    while not fringe.isEmpty():
+        node = fringe.pop()
+
+        if problem.isGoalState(node.state):
+            return node.getPath()
+            
+        if node.state not in visited:
+            visited.add(node.state)
+            for child in problem.getSuccessors(node.state):
+                fringe.push(GraphNode(state= child[0], action= child[1], 
+                prev=node, priority= child[2] + node.priority),
+                 child[2] + node.priority + heuristic(child[0], problem))
+    return list()
+
+
 
 def depthFirstSearch(problem):
     """
@@ -87,29 +155,22 @@ def depthFirstSearch(problem):
     print("Start's successors:", problem.getSuccessors(problem.getStartState()))
     """
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    return graphSearchNoCost(problem, util.Stack())    
 
 def breadthFirstSearch(problem):
     """Search the shallowest nodes in the search tree first."""
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    return graphSearchNoCost(problem, util.Queue())
 
 def uniformCostSearch(problem):
     """Search the node of least total cost first."""
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
-
-def nullHeuristic(state, problem=None):
-    """
-    A heuristic function estimates the cost from the current state to the nearest
-    goal in the provided SearchProblem.  This heuristic is trivial.
-    """
-    return 0
+    return graphSearchWithCost(problem, util.PriorityQueue())
 
 def aStarSearch(problem, heuristic=nullHeuristic):
     """Search the node that has the lowest combined cost and heuristic first."""
-    "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    "*** YOUR CODE HERE ***"  
+    return graphSearchWithCost(problem=problem, fringe=util.PriorityQueue(), heuristic=heuristic)
 
 
 # Abbreviations
